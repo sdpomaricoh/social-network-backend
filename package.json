@@ -1,0 +1,31 @@
+{
+  "name": "social-network-backend",
+  "version": "1.0.0",
+  "description": "social network backend build in nodejs",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "keywords": [
+    "social network",
+    "nodejs",
+    "asynchronous programming"
+  ],
+  "author": "Sergio Pomárico",
+  "license": "MIT",
+  "dependencies": {
+    "app-root-path": "^2.0.1",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.18.3",
+    "connect-multiparty": "^2.1.0",
+    "cors": "^2.8.4",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "helmet": "^3.12.1",
+    "jwt-simple": "^0.5.1",
+    "moment": "^2.22.2",
+    "mongoose": "^5.1.5",
+    "morgan": "^1.9.0",
+    "winston": "^2.4.2"
+  }
+}
