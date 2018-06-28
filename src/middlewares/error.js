@@ -1,3 +1,5 @@
+'use strict';
+
 const error = {};
 
 error._404 = (req, res, next) => {

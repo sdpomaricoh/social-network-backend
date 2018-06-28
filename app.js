@@ -1,3 +1,5 @@
+'use strict';
+
 /*
  * Import dependencies
  */
@@ -12,9 +14,10 @@ require('dotenv').config();
  * config libraries
  */
 const database = require('./src/libs/mongo');
-const headers = require('./src/middlewares/headers')
+const headers = require('./src/middlewares/headers');
 const log = require('./src/libs/log');
-const error = require('./src/middlewares/error')
+const error = require('./src/middlewares/error');
+const router = require('./src/routes');
 
 
 /**
@@ -47,7 +50,6 @@ app.use(headers.config);
 /**
  *import routes
  */
-const router = require('./src/routes');
 app.use('/', router);
 
 

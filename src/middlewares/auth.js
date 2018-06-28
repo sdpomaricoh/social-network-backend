@@ -1,10 +1,12 @@
+'use strict';
+
 /*
  * Import dependencies
  */
 const jwt = require('jwt-simple');
 const moment = require('moment');
 
-function isAuth(req, res, next) {
+const isAuth = (req, res, next) => {
 
 	if (!req.headers.authorization) return res.send({
 		success: false,

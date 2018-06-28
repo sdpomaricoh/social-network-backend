@@ -1,3 +1,5 @@
+'use strict';
+
 const headers = {};
 
 headers.config = (req, res, next) => {
