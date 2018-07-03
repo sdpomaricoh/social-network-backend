@@ -25,6 +25,7 @@
     "jwt-simple": "^0.5.1",
     "moment": "^2.22.2",
     "mongoose": "^5.1.5",
+    "mongoose-unique-validator": "^2.0.1",
     "morgan": "^1.9.0",
     "winston": "^2.4.2"
   }

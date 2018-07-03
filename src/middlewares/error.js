@@ -1,5 +1,10 @@
 'use strict';
 
+/*
+ * Import dependencies
+ */
+const log = require('../libs/log');
+
 const error = {};
 
 error._404 = (req, res, next) => {
