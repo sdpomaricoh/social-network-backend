@@ -91,7 +91,7 @@ authController.check = (req, res) =>{
     payload = jwt.decode(token, process.env.SECRET);
 
     if (payload.exp <= moment.unix())
-      return res.status(200).send({
+      return res.status(401).send({
         success: false,
         message: 'the token has expired'
       });
@@ -102,13 +102,13 @@ authController.check = (req, res) =>{
 
       if (!user) return res.send({ success: false, message: 'user not found' });
 
-      res.send({success: true, user: user});
+      res.status(200).send({success: true, user: user});
 
     });
 
   } catch (err) {
 
-    res.status(500).send({
+    res.status(404).send({
       success: false,
       message: 'Invalid Token'
     })

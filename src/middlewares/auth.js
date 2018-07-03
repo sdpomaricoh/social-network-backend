@@ -23,19 +23,19 @@ const isAuth = (req, res, next) => {
     payload = jwt.decode(token, process.env.SECRET);
 
     if (payload.exp <= moment.unix())
-      res.status(200).send({
+      res.status(401).send({
         success: false,
         message: 'the token has expired'
       });
 
 	} catch (e) {
-	    res.status(200).send({
+	    res.status(404).send({
 			  success: false,
 	      message: 'Invalid token'
 	    })
 	}
 
-  req.role = payload.role;
+  req.user = payload.sub;
 
 	next();
 }

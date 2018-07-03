@@ -6,9 +6,9 @@
 const mongoose = require('mongoose');
 const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcrypt-nodejs');
-const jwt = require('jwt-simple');
-const moment = require('moment');
 const Schema = mongoose.Schema;
+const mongooseBcrypt = require('mongoose-bcrypt');
+require('mongoose-pagination');
 
 /*
  * configuration of allowed attempts
@@ -73,14 +73,17 @@ userSchema.pre('save', function(next) {
 
     // hash the password along with our new salt
     bcrypt.hash(user.password, salt, null, (err, hash) =>{
-      console.log(err, hash);
-      if (err) return next(err);
 
+      if (err) return next(err);
       // override the cleartext password with the hashed one
       user.password = hash;
       next();
     });
   });
+});
+
+userSchema.pre('update', function() {
+  this.update({},{ $set: { updatedAt: new Date() } });
 });
 
 
@@ -190,5 +193,10 @@ userSchema.statics.getAuthenticated = function(email, password, callback) {
  * custom message for duplicate index
  */
 userSchema.plugin(uniqueValidator, {message: 'Error, expected {PATH} to be unique.'});
+
+/**
+ * Encrypt password
+ */
+userSchema.plugin(mongooseBcrypt);
 
 module.exports = mongoose.model('User', userSchema)
