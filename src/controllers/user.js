@@ -5,7 +5,6 @@
  */
 const User = require('../models/user');
 const Helpers = require('../libs/helper');
-const bcrypt = require('bcrypt-nodejs');
 
 const userController = {}
 

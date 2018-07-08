@@ -13,3 +13,8 @@ Dockerfile
 docker-compose.yml
 
 logs/*.log
+*.jpg
+*.jpeg
+*.png
+*.gif
+
