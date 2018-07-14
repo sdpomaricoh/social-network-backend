@@ -8,7 +8,7 @@ const uniqueValidator = require('mongoose-unique-validator');
 const bcrypt = require('bcrypt-nodejs');
 const Schema = mongoose.Schema;
 const mongooseBcrypt = require('mongoose-bcrypt');
-require('mongoose-pagination');
+const mongoosePaginate = require('mongoose-paginate');
 
 /*
  * configuration of allowed attempts
@@ -198,5 +198,10 @@ userSchema.plugin(uniqueValidator, {message: 'Error, expected {PATH} to be uniqu
  * Encrypt password
  */
 userSchema.plugin(mongooseBcrypt);
+
+/**
+ * Paginate
+ */
+userSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('User', userSchema)

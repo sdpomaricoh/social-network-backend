@@ -5,6 +5,7 @@
  */
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const mongoosePaginate = require('mongoose-paginate');
 
 /**
  * [clientSchema client model]
@@ -15,7 +16,7 @@ const followSchema = new Schema ({
     type: Schema.ObjectId,
 		ref: 'User'
   },
-  fallower: {
+  followed: {
     type: Schema.ObjectId,
     ref: 'User'
   },
@@ -25,5 +26,10 @@ const followSchema = new Schema ({
   },
 });
 
+
+/**
+ * Paginate
+ */
+followSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('Follow', followSchema)
