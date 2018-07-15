@@ -1,3 +1,8 @@
+'use strict';
+
+/*
+ * Import dependencies
+ */
 var multer  = require('multer');
 const appRoot = require('app-root-path');
 const path = require('path');

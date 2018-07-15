@@ -74,6 +74,13 @@ authController.login = (req, res) => {
   });
 }
 
+
+/**
+ * [check a user]
+ * @param  {Object} req [Request object]
+ * @param  {Object} res [Response object]
+ * @return {json}       [result of check the session of a user]
+ */
 authController.check = (req, res) =>{
 
   const token = req.body.token;

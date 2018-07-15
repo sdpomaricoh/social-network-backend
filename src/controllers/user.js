@@ -4,7 +4,12 @@
  * Import dependencies
  */
 const User = require('../models/user');
+const Follow = require('../models/follow');
 const Helpers = require('../libs/helper');
+const appRoot = require('app-root-path');
+const path = require('path');
+const fs = require('fs');
+const upload = path.resolve( __dirname, `${appRoot}/uploads/users`);
 
 const userController = {}
 
@@ -21,9 +26,9 @@ userController.save = (req, res) => {
   const user = new User();
 
   //Verify that all necessary data were received
-  if( Helpers.validVariable(params.name) && Helpers.validVariable(params.lastname) &&
-      Helpers.validVariable(params.username) && Helpers.validVariable(params.email) &&
-      Helpers.validVariable(params.password))
+  if( !Helpers.validVariable(params.name) && !Helpers.validVariable(params.lastname) &&
+      !Helpers.validVariable(params.username) && !Helpers.validVariable(params.email) &&
+      !Helpers.validVariable(params.password))
     return res.status(200).send({
       success: false,
       message: 'All data is required'
@@ -85,20 +90,40 @@ userController.all = (req, res) => {
   const userId = req.user;
 
 	if (req.params.page) page = req.params.page;
-	else page = 1;
-	const itemsPerPage = 10;
+  else page = 1;
 
-	User.find().sort('createdAt').paginate(page, itemsPerPage, (err, users, total) => {
-		if (err) return res.send({ success: false, messages: err});
-		if (!users) return res.send({ success: false, message: 'No users to show'});
-		res.send({
-      success: true,
-      users: users,
-      total: total,
-      pages: Math.ceil(total/itemsPerPage)
-    });
+  const options = {
+    sort: 'createdAt',
+    limit: 10,
+    page: page
+  }
+
+	User.paginate({}, options, (err, result) => {
+		if (err) return res.status(500).send({ success: false, messages: err});
+    if (!result) return res.status(200).send({ success: false, message: 'No users to show'});
+      followUsersIds(userId).then((follows)=>{
+        res.send({
+          success: true,
+          users: result.docs,
+          total: result.total,
+          follows: follows,
+          pages: result.pages
+        });
+      }).catch((err)=>{
+        return res.status(500).send({ success: false, messages: err});
+      });
 	});
 };
+
+/**
+ * [find users ids of users followeds]
+ * @param  {string} userId
+ * @return {Array} [result of searching all the users ids followed]
+ */
+async function followUsersIds(userId){
+  var isfollow = await Follow.find({user: userId}).distinct('followed');
+  return isfollow;
+}
 
 
 /**
@@ -109,14 +134,28 @@ userController.all = (req, res) => {
  */
 userController.view = (req, res) => {
 
-  const userId = req.params.id, user = new User();
+  const userId = req.params.id;
+
+  if( !Helpers.validVariable(userId))
+    return res.status(200).send({
+      success: false,
+      message: 'must provide a user id'
+    });
 
   User.findById(userId, (err, user) => {
     if (err)
-      res.send({success: false, message: err});
+      return res.status(500).send({success: false, message: err});
     if (!user)
-      return res.send({success: false, message: 'User not found'});
-    res.send({success: true, user: user});
+      return res.status(200).send({success: false, message: 'User not found'});
+
+    Follow.findOne({user: req.user, followed: userId}, (err, follow)=>{
+      if (err)
+        return res.status(500).send({success: false, message: err});
+      if (!follow)
+        return res.status(200).send({success: true, user: user, follow: false});
+      res.status(200).send({success: true, user: user, follow: true});
+    });
+    res.status(200).send({success: true, user: user});
   });
 };
 
@@ -140,7 +179,7 @@ userController.update = (req, res) => {
       message: 'You do not have authorization to modify the data'
     })
 
-  if(Helpers.validVariable(update.current_password) && Helpers.validVariable(update.new_password)){
+  if(!Helpers.validVariable(update.current_password) && !Helpers.validVariable(update.new_password)){
 
     User.findById(userId, (err, user) => {
 
@@ -152,10 +191,10 @@ userController.update = (req, res) => {
       user.verifyPassword(update.current_password, (err, check) => {
 
         if (err)
-          return res.send({ success: false, message: err});
+          return res.status(500).send({ success: false, message: err});
 
         if (!check)
-          return res.send({ success: false, message: 'invalid password'});
+          return res.status(200).send({ success: false, message: 'invalid password'});
 
         User.encryptPassword(update.new_password, (err, hash) => {
 
@@ -198,6 +237,74 @@ userController.update = (req, res) => {
     });
   }
 
+}
+
+/**
+ * [get a user profile picture]
+ * @param  {Object} req [Request object]
+ * @param  {Object} res [Response object]
+ * @return {file}       [result find a image]
+ */
+userController.profile = (req, res) => {
+
+  const userId = req.params.id;
+
+  User.findById(userId, (err, user) => {
+
+    if (err)
+      res.status(500).send({success: false, message: err});
+    if (!user)
+      return res.status(200).send({success: false, message: 'User not found'});
+
+    if( !Helpers.validVariable(user.image))
+      return res.status(200).send({
+        success: false,
+        message: 'the user does not have a profile picture'
+      });
+
+    const imgPath = upload+'/'+user.image;
+
+    fs.exists(imgPath, (exists)=> {
+
+      if(!exists)
+        return res.status(200).send({success: true, message: 'image not found'});
+
+        res.sendFile(path.resolve(imgPath));
+    })
+
+  });
+}
+
+/**
+ * [count the users followed and the followers of a user]
+ * @param  {Object} req [Request object]
+ * @param  {Object} res [Response object]
+ * @return {Array} [result of count the followed and the followers]
+ */
+userController.counter = (req, res) => {
+  let userId = req.user;
+  if(req.params.id) userId = req.params.id;
+
+  counterFollows(userId).then((result)=>{
+    res.status(200).send({
+      success: false,
+      followeds: result.countFalloweds,
+      fallowers: result.countFallowers});
+  }).catch((err)=>{
+    res.status(500).send({success: false, message: err});
+  });
+
+}
+
+/**
+ * [find users ids of users followeds]
+ * @param  {string} userId
+ * @return {Array} [result of searching all the users ids followed]
+ */
+async function counterFollows(userId){
+  var countFalloweds = await Follow.count({user: userId});
+  var countFallowers = await Follow.count({followed: userId});
+  return {countFalloweds, countFallowers};
 }
 
 module.exports = userController;

@@ -3,7 +3,6 @@
  */
 const fs = require('fs');
 
-
 /**
  * [validate if a value if diferent to undefined, empty and null]
  * @param  {string} value
