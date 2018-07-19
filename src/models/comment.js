@@ -11,27 +11,28 @@ const mongoosePaginate = require('mongoose-paginate');
  * [clientSchema client model]
  * @type {Schema}
  */
-const followSchema = new Schema ({
+const commentSchema = new Schema ({
   user: {
     type: Schema.ObjectId,
 		ref: 'User'
   },
-  followed: {
+  publication: {
     type: Schema.ObjectId,
-    ref: 'User'
-  }
+    ref: 'Publication'
+  },
+  comment: String
 }, {timestamps: true} );
 
 /**
  * [update updatedAt middleware]
  */
-followSchema.pre('update', function() {
+commentSchema.pre('update', function() {
   this.update({},{ $set: { updatedAt: new Date() } });
 });
 
 /**
  * Paginate
  */
-followSchema.plugin(mongoosePaginate);
+commentSchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model('Follow', followSchema)
+module.exports = mongoose.model('Comment', commentSchema)

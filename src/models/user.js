@@ -82,6 +82,9 @@ userSchema.pre('save', function(next) {
   });
 });
 
+/**
+ * [update updatedAt middleware]
+ */
 userSchema.pre('update', function() {
   this.update({},{ $set: { updatedAt: new Date() } });
 });
