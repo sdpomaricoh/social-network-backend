@@ -7,8 +7,9 @@ const mongo = require('mongoose');
 const database = {};
 
 database.connect = (app, port) => {
+  const url = 'mongodb://localhost:27017/social_network';
   mongo.Promise = global.Promise;
-  mongo.connect('mongodb://localhost:27017/social_network')
+  mongo.connect(url,{ useNewUrlParser: true })
     .then(()=>{
       console.log('database connection success');
       app.listen(port, () => {

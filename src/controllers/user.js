@@ -5,11 +5,11 @@
  */
 const User = require('../models/user');
 const Follow = require('../models/follow');
+const Publication = require('../models/publication');
 const Helpers = require('../libs/helper');
 const appRoot = require('app-root-path');
 const path = require('path');
 const fs = require('fs');
-const upload = path.resolve( __dirname, `${appRoot}/uploads/users`);
 
 const userController = {}
 
@@ -155,7 +155,6 @@ userController.view = (req, res) => {
         return res.status(200).send({success: true, user: user, follow: false});
       res.status(200).send({success: true, user: user, follow: true});
     });
-    res.status(200).send({success: true, user: user});
   });
 };
 
@@ -248,6 +247,7 @@ userController.update = (req, res) => {
 userController.profile = (req, res) => {
 
   const userId = req.params.id;
+  const upload = path.resolve( __dirname, `${appRoot}/uploads/users`);
 
   User.findById(userId, (err, user) => {
 
@@ -289,7 +289,9 @@ userController.counter = (req, res) => {
     res.status(200).send({
       success: false,
       followeds: result.countFalloweds,
-      fallowers: result.countFallowers});
+      fallowers: result.countFallowers,
+      publications: result.countPublications
+    });
   }).catch((err)=>{
     res.status(500).send({success: false, message: err});
   });
@@ -302,9 +304,11 @@ userController.counter = (req, res) => {
  * @return {Array} [result of searching all the users ids followed]
  */
 async function counterFollows(userId){
-  var countFalloweds = await Follow.count({user: userId});
-  var countFallowers = await Follow.count({followed: userId});
-  return {countFalloweds, countFallowers};
+  const countFalloweds = await Follow.count({user: userId});
+  const countFallowers = await Follow.count({followed: userId});
+  const countPublications = await Publication.count({user: userId})
+
+  return {countFalloweds, countFallowers, countPublications};
 }
 
 module.exports = userController;

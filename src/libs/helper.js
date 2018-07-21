@@ -21,10 +21,10 @@ const validVariable = (value) => {
  * @param  {string} path
  * @return {json} [result to delete a file]
  */
-const removeFiles = (res, path, message) => {
+const removeFiles = (res, path, message, status, success) => {
   fs.unlink(path, (err)=>{
     if(err) return res.status(500).send({success: false, message: err});
-    return res.status(200).send({success: false, message: message});
+    return res.status(status).send({success: false, message: message});
   })
 }
 
