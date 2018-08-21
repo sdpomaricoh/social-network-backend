@@ -4,11 +4,7 @@
  * Import dependencies
  */
 const Follow = require('../models/follow');
-const User = require('../models/user');
 const Publication = require('../models/publication');
-const path = require('path');
-const fs = require('fs');
-const appRoot = require('app-root-path');
 const Helpers = require('../libs/helper');
 
 
@@ -73,7 +69,7 @@ publicationController.timeline = (req, res) =>{
     sort: 'createdAt',
     limit: 10,
     page: page,
-    populate: { path: 'user'}
+    populate: { path: 'user', select: '_id name lastname email username image'}
   }
 
   followUsersIds(userId)
