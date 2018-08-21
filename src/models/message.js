@@ -12,7 +12,7 @@ const mongoosePaginate = require('mongoose-paginate');
  * @type {Schema}
  */
 const messageSchema = new Schema ({
-  emmiter: {
+  emmitter: {
     type: Schema.ObjectId,
 		ref: 'User'
   },

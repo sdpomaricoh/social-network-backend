@@ -18,6 +18,7 @@ const authController = require('../controllers/auth');
 const uploadsController = require('../controllers/upload');
 const followController = require('../controllers/follow');
 const publicationController = require('../controllers/publication');
+const messageController = require('../controllers/message');
 
 /**
  * Frontend routes
@@ -53,6 +54,15 @@ router.get('/publication/timeline/:page?', isAuth, publicationController.timelin
 router.get('/publication/:id', isAuth, publicationController.view);
 router.delete('/publication/:id', isAuth, publicationController.delete);
 router.post('/publication/upload/:id', [isAuth, publication.single('file')], uploadsController.publication);
+
+/**
+ * Message routes
+ */
+router.post('/message/create', isAuth, messageController.send);
+router.get('/message/received/:page?', isAuth, messageController.received);
+router.get('/message/sended/:page?', isAuth, messageController.sended);
+router.get('/message/unviewed', isAuth, messageController.unviewed);
+router.post('/message/readed', isAuth, messageController.readed);
 
 /**
  * Auth routes
